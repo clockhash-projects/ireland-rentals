@@ -31,7 +31,7 @@ export default function FilterBar({
   return (
     <div className="space-y-3">
       {/* Primary filters - always visible */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
             <MapPin className="h-3 w-3" />
@@ -73,17 +73,17 @@ export default function FilterBar({
         </div>
       </div>
 
-      {/* Toggle more filters */}
+      {/* Toggle more filters - mobile only */}
       <button
         onClick={() => setShowMore(!showMore)}
-        className="text-xs text-primary font-medium flex items-center gap-1"
+        className="text-xs text-primary font-medium flex items-center gap-1 md:hidden"
       >
         <SlidersHorizontal className="h-3 w-3" />
         {showMore ? "Less filters" : "More filters"}
       </button>
 
-      {showMore && (
-        <div className="animate-fade-in">
+      {/* Sort - always visible on desktop, toggled on mobile */}
+      <div className={`animate-fade-in ${!showMore ? "hidden md:block" : ""}`}>
           <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
             <ArrowUpDown className="h-3 w-3" />
             Sort by
@@ -98,8 +98,7 @@ export default function FilterBar({
               <SelectItem value="price-desc">Price: High to Low</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

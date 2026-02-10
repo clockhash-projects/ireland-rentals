@@ -17,9 +17,9 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="bg-primary px-4 pt-6 pb-5">
+    <div className="min-h-screen pb-20 md:pb-8">
+      {/* Header - mobile only */}
+      <header className="bg-primary px-4 pt-6 pb-5 md:hidden">
         <h1 className="text-xl font-bold text-primary-foreground">
           🏠 RentInIreland
         </h1>
@@ -28,8 +28,20 @@ export default function HomePage() {
         </p>
       </header>
 
+      {/* Desktop hero */}
+      <div className="hidden md:block bg-primary px-6 py-10">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl font-bold text-primary-foreground">
+            Find Your Perfect Rental in Ireland
+          </h1>
+          <p className="text-primary-foreground/80 text-base mt-1">
+            Trusted rental listings for the Indian community in Ireland
+          </p>
+        </div>
+      </div>
+
       {/* Filters */}
-      <div className="px-4 -mt-3">
+      <div className="px-4 -mt-3 md:px-6 md:-mt-5 md:max-w-6xl md:mx-auto">
         <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
           <FilterBar
             city={city}
@@ -43,7 +55,7 @@ export default function HomePage() {
       </div>
 
       {/* Results */}
-      <div className="px-4 mt-4">
+      <div className="px-4 mt-4 md:px-6 md:max-w-6xl md:mx-auto">
         <p className="text-xs text-muted-foreground mb-3">
           {properties.length} {properties.length === 1 ? "property" : "properties"} found
         </p>
@@ -57,7 +69,7 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {properties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}

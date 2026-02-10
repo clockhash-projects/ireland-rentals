@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import BottomNav from "@/components/BottomNav";
+import TopNav from "@/components/TopNav";
 import Index from "./pages/Index";
 import PropertyDetail from "./pages/PropertyDetail";
 import PostProperty from "./pages/PostProperty";
@@ -23,6 +24,7 @@ function AppLayout() {
 
   return (
     <>
+      {!hideNav && <TopNav />}
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/property/:id" element={<PropertyDetail />} />

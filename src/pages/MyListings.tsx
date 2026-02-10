@@ -26,7 +26,7 @@ export default function MyListings() {
   const myListings = MOCK_PROPERTIES.slice(0, 2);
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 md:pb-8">
       <div className="sticky top-0 z-30 bg-card/90 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 text-sm font-medium text-foreground">
           <ArrowLeft className="h-4 w-4" />
@@ -40,9 +40,9 @@ export default function MyListings() {
         </Button>
       </div>
 
-      <div className="px-4 py-5">
+      <div className="px-4 py-5 md:max-w-5xl md:mx-auto md:px-6">
         <h1 className="text-lg font-bold text-foreground mb-4">My Listings</h1>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {myListings.map((p) => (
             <PropertyCard key={p.id} property={p} />
           ))}

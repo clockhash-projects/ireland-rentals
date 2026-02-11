@@ -42,7 +42,7 @@ export default function MyListings() {
 
       <div className="px-4 py-5 md:max-w-5xl md:mx-auto md:px-6">
         <h1 className="text-lg font-bold text-foreground mb-4">My Listings</h1>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
           {myListings.map((p) => (
             <PropertyCard key={p.id} property={p} />
           ))}

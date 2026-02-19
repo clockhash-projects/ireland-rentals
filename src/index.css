@@ -4,35 +4,38 @@
 
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 220 20% 12%;
+    /* Modern Emerald & Platinum Palette */
+    --background: 210 20% 99%;
+    --foreground: 220 30% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 12%;
+    --card-foreground: 220 30% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 12%;
+    --popover-foreground: 220 30% 15%;
 
-    --primary: 168 50% 38%;
+    /* Rich Irish Emerald */
+    --primary: 158 64% 32%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 20% 95%;
-    --secondary-foreground: 220 20% 12%;
+    --secondary: 158 20% 96%;
+    --secondary-foreground: 158 60% 20%;
 
-    --muted: 40 15% 93%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 210 10% 95%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 24 85% 55%;
-    --accent-foreground: 0 0% 100%;
+    /* Golden Gorse Accent */
+    --accent: 42 100% 50%;
+    --accent-foreground: 24 10% 10%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
-    --ring: 168 50% 38%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 158 64% 50%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -48,33 +51,33 @@
   }
 
   .dark {
-    --background: 220 20% 8%;
-    --foreground: 40 20% 95%;
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
 
-    --card: 220 20% 12%;
-    --card-foreground: 40 20% 95%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 40 20% 95%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 168 50% 45%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 158 64% 45%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 40 20% 95%;
+    --secondary: 222 47% 15%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 222 47% 15%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 24 85% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 42 100% 60%;
+    --accent-foreground: 222 47% 4%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 168 50% 45%;
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 158 64% 45%;
 
     --whatsapp: 142 70% 40%;
     --whatsapp-foreground: 0 0% 100%;
@@ -88,6 +91,105 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+    background-image:
+      radial-gradient(circle at 2px 2px, hsl(var(--foreground) / 0.05) 1px, transparent 0);
+    background-size: 32px 32px;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-xl border border-white/10;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Stagger delays extended */
+  .card-stagger-1 {
+    animation-delay: 100ms;
+  }
+
+  .card-stagger-2 {
+    animation-delay: 200ms;
+  }
+
+  .card-stagger-3 {
+    animation-delay: 300ms;
+  }
+
+  .card-stagger-4 {
+    animation-delay: 400ms;
+  }
+
+  .card-stagger-5 {
+    animation-delay: 500ms;
+  }
+
+  .card-stagger-6 {
+    animation-delay: 600ms;
+  }
+
+  .card-stagger-7 {
+    animation-delay: 700ms;
+  }
+
+  .card-stagger-8 {
+    animation-delay: 800ms;
   }
 }

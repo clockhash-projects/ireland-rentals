@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { User } from "@/lib/api";
+import { apiClient } from "@/api/axios";
+
+interface User {
+  id: string;
+  email: string;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -14,17 +19,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (email: string, _password: string) => {
-    // Mock login
-    setUser({ id: "1", name: email.split("@")[0], email });
+  const login = async (email: string, password: string) => {
+    const response = await apiClient.post("/auth/login", {
+      email,
+      password,
+    });
+
+    const token = response.data.access_token;
+
+    localStorage.setItem("token", token);
+
+    setUser({ id: "temp", email });
   };
 
-  const signup = async (name: string, email: string, _password: string) => {
-    // Mock signup
-    setUser({ id: "1", name, email });
+  const signup = async (name: string, email: string, password: string) => {
+    await apiClient.post("/auth/signup", {
+      email,
+      password,
+      full_name: name,
+    });
+
+    await login(email, password);
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, signup, logout, isAuthenticated: !!user }}>

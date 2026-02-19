@@ -1,18 +1,22 @@
 export interface Property {
   id: string;
   title: string;
-  description: string;
-  propertyType: "apartment" | "house" | "room";
-  rent: number;
-  city: string;
-  area: string;
+  description?: string;
+  property_type: string;
+  rent_amount: number;
   address: string;
-  phone: string;
-  whatsapp: string;
-  images: string[];
-  postedBy: string;
-  postedAt: string;
+  city: string;
+  state: string;
+  zip_code: string;
+
+  contact_phone?: string;
+  contact_whatsapp?: string;
+
+  owner_id: string;
+  is_active: boolean;
+  created_at: string;
 }
+
 
 export interface User {
   id: string;

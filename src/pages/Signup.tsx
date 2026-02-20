@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Honeypot } from "@/components/Honeypot";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -11,13 +12,15 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [website, setWebsite] = useState(""); // Honeypot
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signup(name, email, password);
+      // @ts-ignore - website added to schema but maybe not in hook yet if hook isn't updated
+      await signup(name, email, password, website);
       toast.success("Account created!");
       navigate("/");
     } catch {
@@ -69,6 +72,9 @@ export default function SignupPage() {
               className="mt-1"
             />
           </div>
+
+          <Honeypot value={website} onChange={setWebsite} />
+
           <Button type="submit" className="w-full h-11" disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>

@@ -10,9 +10,9 @@ export function formatRent(rent: number): string {
   return `€${rent.toLocaleString()}/mo`;
 }
 
-export function getWhatsAppLink(phone: string, message?: string): string {
+export function getWhatsAppLink(phone: string, propertyTitle: string, propertyUrl: string): string {
   const cleaned = phone.replace(/[^0-9+]/g, "");
-  const msg = message || "Hi, I saw your property listing on RentInIreland and I'm interested.";
+  const msg = `I would like to know more about this property: ${propertyTitle}\n${propertyUrl}`;
   return `https://wa.me/${cleaned.replace("+", "")}?text=${encodeURIComponent(msg)}`;
 }
 

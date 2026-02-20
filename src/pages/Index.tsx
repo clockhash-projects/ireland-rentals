@@ -1,17 +1,23 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useProperties } from "@/features/properties/useProperties";
 import { toUIProperty } from "@/features/properties/mappers";
-import { IRISH_LOCATIONS } from "@/lib/api";
+import { IRISH_COUNTIES, COUNTY_DATA } from "@/lib/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/PropertyCard";
 import { MapPin, Home, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 const Index = () => {
+  const [county, setCounty] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [type, setType] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToResults = () => {
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Debounce search input
   useEffect(() => {
@@ -20,10 +26,11 @@ const Index = () => {
   }, [searchQuery]);
 
   const filters = useMemo(() => ({
+    county: county || undefined,
     city: city || undefined,
     property_type: type || undefined,
     search: debouncedSearch || undefined,
-  }), [city, type, debouncedSearch]);
+  }), [county, city, type, debouncedSearch]);
 
   const { properties, loading, error } = useProperties(filters);
 
@@ -71,23 +78,54 @@ const Index = () => {
                   placeholder="Area, keywords or title..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") scrollToResults();
+                  }}
                   className="pl-12 h-14 bg-white/80 border-0 focus-visible:ring-emerald-500 rounded-2xl text-base shadow-sm"
                 />
               </div>
 
-              {/* Location Select */}
+              {/* County Select */}
               <div className="flex-1">
-                <Select onValueChange={(v) => setCity(v === "all" ? "" : v)}>
+                <Select
+                  value={county || "all"}
+                  onValueChange={(v) => {
+                    setCounty(v === "all" ? "" : v);
+                    setCity(""); // Reset city when county changes
+                  }}
+                >
                   <SelectTrigger className="bg-white/80 border-0 h-14 rounded-2xl font-medium text-base shadow-sm">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-5 w-5 text-emerald-600 shrink-0" />
-                      <SelectValue placeholder="City" />
+                      <SelectValue placeholder="County" />
                     </div>
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-emerald-100">
-                    <SelectItem value="all">All Cities</SelectItem>
-                    {IRISH_LOCATIONS.map((loc) => (
+                  <SelectContent className="rounded-xl border-emerald-100 max-h-[300px] overflow-y-auto">
+                    <SelectItem value="all">All Counties</SelectItem>
+                    {IRISH_COUNTIES.map((loc) => (
                       <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* City/Place Select */}
+              <div className="flex-1">
+                <Select
+                  value={city || "all"}
+                  onValueChange={(v) => setCity(v === "all" ? "" : v)}
+                  disabled={!county}
+                >
+                  <SelectTrigger className="bg-white/80 border-0 h-14 rounded-2xl font-medium text-base shadow-sm disabled:opacity-50">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-emerald-600 shrink-0" />
+                      <SelectValue placeholder={county ? "Place" : "Select County"} />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-emerald-100 max-h-[300px] overflow-y-auto">
+                    <SelectItem value="all">All Places</SelectItem>
+                    {county && COUNTY_DATA[county]?.map((place) => (
+                      <SelectItem key={place} value={place}>{place}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -112,7 +150,10 @@ const Index = () => {
               </div>
 
               {/* Search Button (UI Only, filtering is reactive) */}
-              <button className="bg-primary hover:bg-emerald-700 text-white font-bold h-14 px-8 rounded-2xl transition-all shadow-lg active:scale-95 hidden md:block">
+              <button
+                onClick={scrollToResults}
+                className="bg-primary hover:bg-emerald-700 text-white font-bold h-14 px-8 rounded-2xl transition-all shadow-lg active:scale-95 hidden md:block"
+              >
                 Search
               </button>
             </div>
@@ -121,7 +162,7 @@ const Index = () => {
       </div>
 
       {/* ── Listing Section ──────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div ref={resultsRef} className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-black text-foreground tracking-tight">
@@ -132,9 +173,9 @@ const Index = () => {
             </p>
           </div>
 
-          {(city || type || debouncedSearch) && (
+          {(county || city || type || debouncedSearch) && (
             <button
-              onClick={() => { setCity(""); setType(""); setSearchQuery(""); }}
+              onClick={() => { setCounty(""); setCity(""); setType(""); setSearchQuery(""); }}
               className="text-xs font-bold text-emerald-600 hover:text-emerald-700 underline underline-offset-4"
             >
               Clear all filters

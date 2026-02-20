@@ -24,24 +24,42 @@ export interface User {
   email: string;
 }
 
-export const IRISH_LOCATIONS = [
-  "Dublin",
-  "Cork",
-  "Galway",
-  "Limerick",
-  "Waterford",
-  "Drogheda",
-  "Dundalk",
-  "Swords",
-  "Navan",
-  "Ennis",
-  "Kilkenny",
-  "Carlow",
-  "Tralee",
-  "Athlone",
-  "Letterkenny",
-  "Maynooth",
-] as const;
+export const COUNTY_DATA: Record<string, string[]> = {
+  "Antrim": ["Belfast", "Antrim", "Ballymena", "Lisburn", "Larne", "Carrickfergus", "Bushmills", "Cushendall"],
+  "Armagh": ["Armagh", "Craigavon", "Lurgan", "Portadown", "Newry", "Keady", "Crossmaglen"],
+  "Carlow": ["Carlow", "Tullow", "Muine Bheag", "Leighlinbridge", "Borris", "Hacketstown"],
+  "Cavan": ["Cavan", "Bailieborough", "Cootehill", "Kingscourt", "Belturbet", "Mullagh", "Virginia"],
+  "Clare": ["Ennis", "Shannon", "Kilrush", "Ennistymon", "Tulla", "Killaloe", "Corofin", "Lahinch", "Lisdoonvarna"],
+  "Cork": ["Cork City", "Ballincollig", "Carrigaline", "Cobh", "Mallow", "Midleton", "Youghal", "Bandon", "Kinsale", "Skibbereen", "Clonakilty", "Bantry", "Fermoy"],
+  "Derry": ["Derry City", "Coleraine", "Limavady", "Magherafelt", "Portstewart", "Kilrea"],
+  "Donegal": ["Letterkenny", "Buncrana", "Ballyshannon", "Donegal Town", "Lifford", "Bundoran", "Killybegs", "Gweedore"],
+  "Down": ["Belfast", "Bangor", "Newtownards", "Downpatrick", "Banbridge", "Holywood", "Newcastle", "Warrenpoint"],
+  "Dublin": ["Dublin City", "Tallaght", "Blanchardstown", "Clondalkin", "Lucan", "Swords", "Dún Laoghaire", "Balbriggan", "Malahide", "Skerries", "Lusk", "Rush"],
+  "Fermanagh": ["Enniskillen", "Lisnaskea", "Irvinestown", "Belleek", "Derrygonnelly"],
+  "Galway": ["Galway City", "Tuam", "Ballinasloe", "Loughrea", "Athenry", "Moycullen", "Clifden", "Gort", "Oranmore", "Oughterard", "Barna"],
+  "Kerry": ["Tralee", "Killarney", "Listowel", "Kenmare", "Dingle", "Cahersiveen", "Killorglin", "Ballybunion"],
+  "Kildare": ["Naas", "Newbridge", "Celbridge", "Leixlip", "Maynooth", "Athy", "Kildare Town", "Kilcock", "Clane", "Sallins"],
+  "Kilkenny": ["Kilkenny City", "Callan", "Thomastown", "Graiguenamanagh", "Castlecomer", "Ballyragget"],
+  "Laois": ["Portlaoise", "Portarlington", "Mountmellick", "Abbeyleix", "Mountrath", "Stradbally"],
+  "Leitrim": ["Carrick-on-Shannon", "Manorhamilton", "Mohill", "Ballinamore", "Kinlough"],
+  "Limerick": ["Limerick City", "Newcastle West", "Rathkeale", "Abbeyfeale", "Kilmallock", "Castleconnell", "Adare"],
+  "Longford": ["Longford Town", "Edgeworthstown", "Granard", "Lanesborough", "Ballymahon"],
+  "Louth": ["Dundalk", "Drogheda", "Ardee", "Dunleer", "Carlingford"],
+  "Mayo": ["Castlebar", "Ballina", "Westport", "Claremorris", "Ballinrobe", "Belmullet", "Swinford", "Kiltimagh"],
+  "Meath": ["Navan", "Trim", "Kells", "Ashbourne", "Dunboyne", "Ratoath", "Stamullen", "Oldcastle"],
+  "Monaghan": ["Monaghan Town", "Carrickmacross", "Castleblayney", "Clones", "Ballybay"],
+  "Offaly": ["Tullamore", "Edenderry", "Birr", "Clara", "Banagher", "Ferbane"],
+  "Roscommon": ["Roscommon Town", "Boyle", "Castlerea", "Athlone", "Ballaghaderreen", "Strokestown"],
+  "Sligo": ["Sligo Town", "Tubbercurry", "Ballymote", "Collooney", "Strandhill"],
+  "Tipperary": ["Clonmel", "Nenagh", "Thurles", "Tipperary Town", "Cashel", "Roscrea", "Carrick-on-Suir", "Cahir", "Templemore"],
+  "Tyrone": ["Omagh", "Cookstown", "Dungannon", "Strabane", "Coalisland", "Castlederg"],
+  "Waterford": ["Waterford City", "Dungarvan", "Tramore", "Lismore", "Dunmore East", "Portlaw"],
+  "Westmeath": ["Mullingar", "Athlone", "Moate", "Castlepollard", "Kilbeggan"],
+  "Wexford": ["Wexford Town", "Enniscorthy", "New Ross", "Gorey", "Bunclody", "Rosslare"],
+  "Wicklow": ["Bray", "Wicklow Town", "Arklow", "Greystones", "Blessington", "Enniskerry", "Rathdrum"]
+};
+
+export const IRISH_COUNTIES = Object.keys(COUNTY_DATA).sort();
 
 export const PROPERTY_TYPES = [
   { value: "apartment", label: "Apartment" },

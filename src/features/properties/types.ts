@@ -7,6 +7,7 @@ export interface Property {
     location_id?: string;
     address?: string;
     city?: string;
+    county?: string;
     state?: string;
     zip_code?: string;
     contact_phone?: string;

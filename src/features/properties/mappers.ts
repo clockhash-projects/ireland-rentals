@@ -40,7 +40,7 @@ export const toUIProperty = (property: Property): UIProperty => ({
     area: property.city ?? property.location_id ?? "Ireland",
     city: property.city ?? "Ireland",
     address: property.address,
-    state: property.state,
+    county: property.county || property.state,
     zipCode: property.zip_code,
     contactPhone: property.contact_phone,
     contactWhatsapp: property.contact_whatsapp,

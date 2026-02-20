@@ -9,7 +9,7 @@ export interface UIProperty {
     // Extended fields from backend PropertyOut
     description?: string;
     address?: string;
-    state?: string;
+    county?: string;
     zipCode?: string;
     contactPhone?: string;
     contactWhatsapp?: string;

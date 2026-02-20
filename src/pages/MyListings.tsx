@@ -19,7 +19,7 @@ const MOCK_MY_LISTINGS: UIProperty[] = [
     city: "Dublin",
     area: "City Centre",
     address: "Grand Canal Dock, Dublin 2",
-    state: "Co. Dublin",
+    county: "Co. Dublin",
     zipCode: "D02 XY12",
     contactPhone: "+353851234567",
     contactWhatsapp: "+353851234567",
@@ -38,7 +38,7 @@ const MOCK_MY_LISTINGS: UIProperty[] = [
     city: "Cork",
     area: "Bishopstown",
     address: "Bishopstown Road, Cork",
-    state: "Co. Cork",
+    county: "Co. Cork",
     contactPhone: "+353879876543",
     contactWhatsapp: "+353879876543",
     images: [
@@ -74,7 +74,7 @@ const MOCK_MY_LISTINGS: UIProperty[] = [
     city: "Dublin",
     area: "IFSC",
     address: "Mayor Street, Dublin 1",
-    state: "Co. Dublin",
+    county: "Co. Dublin",
     zipCode: "D01 A2B3",
     contactPhone: "+353851239876",
     contactWhatsapp: "+353851239876",
@@ -130,10 +130,9 @@ export default function MyListings() {
       try {
         setLoading(true);
         const data = await getMyProperties();
-        // If API returns listings use them, else fall back to mock data
-        setProperties(data.length > 0 ? data.map(toUIProperty) : MOCK_MY_LISTINGS);
-      } catch {
-        setProperties(MOCK_MY_LISTINGS);
+        setProperties(data.map(toUIProperty));
+      } catch (err) {
+        console.error("Failed to fetch listings:", err);
       } finally {
         setLoading(false);
       }
@@ -141,8 +140,6 @@ export default function MyListings() {
 
     if (isAuthenticated) {
       fetch();
-    } else {
-      // Show mock data preview even when not authenticated after login prompt
     }
   }, [isAuthenticated]);
 
@@ -192,10 +189,24 @@ export default function MyListings() {
               <div key={i} className="rounded-xl bg-muted animate-pulse aspect-[4/3]" />
             ))}
           </div>
+        ) : properties.length === 0 ? (
+          <div className="text-center py-20 bg-muted/30 rounded-3xl border-2 border-dashed border-border">
+            <PlusCircle className="h-12 w-12 text-muted-foreground/20 mx-auto mb-4" />
+            <h3 className="font-bold text-foreground">No listings yet</h3>
+            <p className="text-sm text-muted-foreground mb-6">You haven't posted any properties for rent.</p>
+            <Button asChild>
+              <Link to="/post">Post your first listing</Link>
+            </Button>
+          </div>
         ) : (
           <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {properties.map((p, i) => (
-              <PropertyCard key={p.id} property={p} staggerIndex={i} />
+              <PropertyCard
+                key={p.id}
+                property={p}
+                staggerIndex={i}
+                isOwner={true}
+              />
             ))}
           </div>
         )}

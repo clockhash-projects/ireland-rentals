@@ -4,6 +4,7 @@ import { Property } from "./types";
 export interface PropertyFilters {
     location_id?: string;
     property_type?: string;
+    county?: string;
     city?: string;
     search?: string;
 }
@@ -31,4 +32,7 @@ export const getMyProperties = async () => {
     const response = await apiClient.get("/properties/me");
     return response.data;
 };
-
+export const updateProperty = async (id: string, data: any) => {
+    const response = await apiClient.put(`/properties/${id}`, data);
+    return response.data;
+};

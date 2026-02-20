@@ -1,5 +1,7 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import { getPropertyById } from "@/features/properties/property.service";
 import { toUIProperty } from "@/features/properties/mappers";
 import { UIProperty } from "@/types/ui-property";
@@ -32,6 +34,8 @@ function PropertyTypeBadge({ type }: { type: string }) {
 
 export default function PropertyDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [property, setProperty] = useState<UIProperty | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,6 +54,59 @@ export default function PropertyDetail() {
     };
     load();
   }, [id]);
+
+  const handleShare = async () => {
+    if (!property) return;
+    const shareData = {
+      title: property.title,
+      text: `Check out this rental on Irish Rentals: ${property.title}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        handleCopyLink();
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    try {
+      // Modern API
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard!");
+        return;
+      }
+
+      // Fallback for non-secure contexts or older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = url;
+      textArea.style.position = "fixed"; // avoid scrolling to it
+      textArea.style.left = "-9999px";
+      textArea.style.top = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        toast.success("Link copied to clipboard!");
+      } else {
+        throw new Error("Copy failed");
+      }
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy link. Please manually copy the URL.");
+    }
+  };
 
   if (loading) {
     return (
@@ -89,9 +146,21 @@ export default function PropertyDetail() {
             <ArrowLeft className="h-4 w-4" />
             Back to listings
           </Link>
-          <button className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors" aria-label="Share">
-            <Share2 className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full hover:bg-muted transition-colors border border-border"
+            >
+              Copy link
+            </button>
+            <button
+              onClick={handleShare}
+              className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors border border-border"
+              aria-label="Share"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* ── Image Carousel ──────────────────────────────────── */}
@@ -120,7 +189,7 @@ export default function PropertyDetail() {
           <div className="flex items-center gap-1.5 text-muted-foreground text-sm mb-4">
             <MapPin className="h-4 w-4 shrink-0" />
             <span>
-              {[property.address, property.area, property.city, property.state].filter(Boolean).join(", ")}
+              {[property.address, property.area, property.city, property.county].filter(Boolean).join(", ")}
             </span>
           </div>
 
@@ -165,10 +234,10 @@ export default function PropertyDetail() {
                   <p className="text-xs text-muted-foreground">City</p>
                   <p className="font-semibold text-foreground">{property.city || "—"}</p>
                 </div>
-                {property.state && (
+                {property.county && (
                   <div>
                     <p className="text-xs text-muted-foreground">County</p>
-                    <p className="font-semibold text-foreground">{property.state}</p>
+                    <p className="font-semibold text-foreground">{property.county}</p>
                   </div>
                 )}
                 {property.zipCode && (
@@ -191,7 +260,19 @@ export default function PropertyDetail() {
           <div className="space-y-5">
             <section className="bg-card rounded-2xl border border-border p-5 sticky top-20">
               <h2 className="font-bold text-foreground mb-4">Contact landlord</h2>
-              {(property.contactPhone || property.contactWhatsapp) ? (
+              {!isAuthenticated ? (
+                <div className="bg-muted/50 rounded-xl p-6 text-center border-2 border-dashed border-border/50">
+                  <Phone className="h-8 w-8 mx-auto mb-3 opacity-20" />
+                  <p className="text-sm font-semibold mb-1">Contact Hidden</p>
+                  <p className="text-xs text-muted-foreground mb-4">Only registered users can view the phone number.</p>
+                  <button
+                    onClick={() => navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)}
+                    className="text-primary font-bold text-sm hover:underline"
+                  >
+                    Sign in to view details
+                  </button>
+                </div>
+              ) : (property.contactPhone || property.contactWhatsapp) ? (
                 <div className="space-y-3">
                   {property.contactPhone && (
                     <a
@@ -204,7 +285,7 @@ export default function PropertyDetail() {
                   )}
                   {property.contactWhatsapp && (
                     <a
-                      href={getWhatsAppLink(property.contactWhatsapp)}
+                      href={getWhatsAppLink(property.contactWhatsapp, property.title, window.location.href)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp))/90] text-white font-semibold py-3 rounded-xl transition-colors text-sm"

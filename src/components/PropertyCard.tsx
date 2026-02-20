@@ -7,9 +7,10 @@ import { MapPin } from "lucide-react";
 interface PropertyCardProps {
   property: UIProperty;
   staggerIndex?: number;
+  isOwner?: boolean;
 }
 
-export default function PropertyCard({ property, staggerIndex = 0 }: PropertyCardProps) {
+export default function PropertyCard({ property, staggerIndex = 0, isOwner = false }: PropertyCardProps) {
   const TypeIcon = propertyTypeIcons[property.propertyType as keyof typeof propertyTypeIcons] ?? MapPin;
   const staggerClass = `card-stagger-${Math.min(staggerIndex + 1, 8)}`;
 
@@ -40,6 +41,16 @@ export default function PropertyCard({ property, staggerIndex = 0 }: PropertyCar
         <span className="absolute top-2.5 right-2.5 bg-primary text-primary-foreground text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
           {formatRent(property.rent)}
         </span>
+
+        {isOwner && (
+          <Link
+            to={`/edit/${property.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-2.5 right-2.5 bg-white/90 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm border border-border/50 hover:bg-primary hover:text-white transition-colors"
+          >
+            Edit listing
+          </Link>
+        )}
       </div>
 
       {/* Info */}

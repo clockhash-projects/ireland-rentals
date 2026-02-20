@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { IRISH_LOCATIONS, PROPERTY_TYPES } from "@/lib/api";
+import { IRISH_COUNTIES, COUNTY_DATA, PROPERTY_TYPES } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,7 @@ import {
 import { ArrowLeft, Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiClient } from "@/api/axios";
+import { Honeypot } from "@/components/Honeypot";
 
 export default function PostProperty() {
   const { isAuthenticated } = useAuth();
@@ -26,9 +27,11 @@ export default function PostProperty() {
     description: "",
     propertyType: "",
     rent: "",
+    county: "",
     city: "",
     address: "",
     phone: "",
+    website: "", // Honeypot
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -75,6 +78,21 @@ export default function PostProperty() {
     if (!form.propertyType) { toast.error("Please select a property type."); return; }
     if (!form.city) { toast.error("Please select a city."); return; }
 
+    // Rent validation
+    const rentValue = Number(form.rent);
+    if (isNaN(rentValue) || rentValue <= 0) {
+      toast.error("Please enter a valid monthly rent amount greater than 0.");
+      return;
+    }
+
+    // Phone validation (+353)
+    const phoneRegex = /^\+353[0-9]{7,10}$/;
+    const cleanPhone = form.phone.replace(/\s/g, "");
+    if (!phoneRegex.test(cleanPhone)) {
+      toast.error("Please enter a valid Irish phone number starting with +353 (e.g., +353871234567)");
+      return;
+    }
+
     setSubmitting(true);
     try {
       // 1. Create the property
@@ -82,13 +100,14 @@ export default function PostProperty() {
         title: form.title,
         description: form.description,
         property_type: form.propertyType,
-        rent_amount: Number(form.rent),
+        rent_amount: rentValue,
         address: form.address,
         city: form.city,
-        state: "Ireland",
+        county: form.county, // Mapped to new backend field
         zip_code: "0000",
-        contact_phone: form.phone,
-        contact_whatsapp: form.phone,
+        contact_phone: cleanPhone,
+        contact_whatsapp: cleanPhone,
+        website: form.website, // Honeypot
       });
 
       // 2. Upload images if any were selected
@@ -176,35 +195,67 @@ export default function PostProperty() {
               <label className="text-sm font-medium text-foreground">Rent (€/month)</label>
               <Input
                 type="number"
-                placeholder="e.g. 1200"
+                placeholder="e.g. 1500"
                 value={form.rent}
                 onChange={(e) => update("rent", e.target.value)}
                 required
+                min="1"
                 className="mt-1"
               />
+              <p className="text-[10px] text-muted-foreground mt-1">Total monthly cost in Euros.</p>
             </div>
           </div>
 
-          {/* City */}
+          {/* County Selection */}
           <div>
-            <label className="text-sm font-medium text-foreground">City / Location</label>
-            <Select value={form.city} onValueChange={(v) => update("city", v)}>
+            <label className="text-sm font-medium text-foreground">County</label>
+            <Select
+              value={form.county}
+              onValueChange={(v) => {
+                update("county", v);
+                update("city", ""); // Reset city when county changes
+              }}
+            >
               <SelectTrigger className="mt-1 bg-card">
-                <SelectValue placeholder="Select city" />
+                <SelectValue placeholder="Select county" />
               </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                {IRISH_LOCATIONS.map((loc) => (
-                  <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+              <SelectContent className="bg-popover z-50 max-h-[300px] overflow-y-auto">
+                {IRISH_COUNTIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
+          {/* Place/City Selection */}
+          <div>
+            <label className="text-sm font-medium text-foreground">City / Place</label>
+            <Select
+              value={form.city}
+              onValueChange={(v) => update("city", v)}
+              disabled={!form.county}
+            >
+              <SelectTrigger className="mt-1 bg-card">
+                <SelectValue placeholder={form.county ? "Select place" : "Select county first"} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50 max-h-[300px] overflow-y-auto">
+                {form.county && COUNTY_DATA[form.county]?.map((place) => (
+                  <SelectItem key={place} value={place}>{place}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {!form.county && (
+              <p className="text-[10px] text-muted-foreground mt-1 italic">
+                Please select a county to see available places.
+              </p>
+            )}
+          </div>
+
           {/* Address */}
           <div>
-            <label className="text-sm font-medium text-foreground">Address / Area</label>
+            <label className="text-sm font-medium text-foreground">Area / Specific Address</label>
             <Input
-              placeholder="e.g. Bishopstown, Cork"
+              placeholder="e.g. 12 O'Connell Street or Rathmines"
               value={form.address}
               onChange={(e) => update("address", e.target.value)}
               required
@@ -216,13 +267,15 @@ export default function PostProperty() {
           <div>
             <label className="text-sm font-medium text-foreground">Phone / WhatsApp</label>
             <Input
-              placeholder="+353..."
+              placeholder="+353871234567"
               value={form.phone}
               onChange={(e) => update("phone", e.target.value)}
               required
               className="mt-1"
             />
-            <p className="text-xs text-muted-foreground mt-1">Visible to potential tenants.</p>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Must start with <strong>+353</strong>. Visible to potential tenants.
+            </p>
           </div>
 
           {/* ── Image Upload ── */}
@@ -289,6 +342,11 @@ export default function PostProperty() {
               onChange={handleFileChange}
             />
           </div>
+
+          <Honeypot
+            value={form.website}
+            onChange={(val) => update("website", val)}
+          />
 
           <Button type="submit" className="w-full h-12 text-base" disabled={submitting}>
             {submitting ? (
